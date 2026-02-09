@@ -1,4 +1,4 @@
-package psp;
+package psp.block;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

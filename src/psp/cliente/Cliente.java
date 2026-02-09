@@ -1,4 +1,4 @@
-package psp;
+package psp.cliente;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class Cliente {
 
             System.out.println("Ingrese temperautra actual:");
             double temp = sc.nextDouble();
-            out.println(SENSOR_ID + ":" +"TEMP:"+temp);
+            out.println(SENSOR_ID + ";TEMP:" + temp);
 
 
             String respuesta = in.readLine();

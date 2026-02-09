@@ -1,4 +1,4 @@
-package psp;
+package psp.service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
