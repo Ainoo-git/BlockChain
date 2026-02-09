@@ -17,7 +17,7 @@ public class Cliente {
         Scanner sc = new Scanner(System.in);
         try (
                 Socket socket = new Socket(remoteIP, 6000);
-                PrintWriter out = new PrintWriter(socket.getOutputStream());
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
         ){
 
