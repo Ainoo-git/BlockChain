@@ -1,34 +1,34 @@
 package psp;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Date;
 
-public final class Block {
+public class Block {
+    public String hash;
+    public String previousHash;
+    private String data; // Aquí irá la temperatura
+    private long timeStamp;
 
-    public final int index;
-    public final long timestamp;
-    public final String data;
-    public final String previousHash;
-    public final String hash;
-
-    public Block(int index, String data, String previousHash) {
-        this.index = index;
-        this.timestamp = System.currentTimeMillis();
+    public Block(String data, String previousHash) {
         this.data = data;
         this.previousHash = previousHash;
-        this.hash = calcularHash();
+        this.timeStamp = new Date().getTime();
+        this.hash = calculateHash();
     }
 
-    private String calcularHash() {
+    public String calculateHash() {
+        String input = previousHash + Long.toString(timeStamp) + data;
         try {
-            String input = index + timestamp + data + previousHash;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] bytes = digest.digest(input.getBytes("UTF-8"));
-
-            StringBuilder hex = new StringBuilder();
-            for (byte b : bytes) {
-                hex.append(String.format("%02x", b));
+            byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
             }
-            return hex.toString();
+            return hexString.toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
