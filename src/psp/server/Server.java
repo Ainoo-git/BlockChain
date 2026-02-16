@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-
+//Ainoha Yubero Timón
 public class Server {
 
     private static final List<Block> blockchain = new ArrayList<>();

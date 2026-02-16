@@ -5,22 +5,19 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
+//Ainoha Yubero Timón
 public class DataService {
     // Configuración de la base de datos remota
     private static final String IP = "192.168.20.118";
     private static final String DB = "sistema_monitoreo";
     private static final String URL = "jdbc:mysql://" + IP + ":3306/" + DB + "?useSSL=false&serverTimezone=UTC";
-    private static final String USER = "alex"; // Cambia por tu usuario
-    private static final String PASS = "1234"; // Cambia por tu contraseña
+    private static final String USER = "Ainoha Yubero Timón";
+    private static final String PASS = "12345"; // Cambia por tu contraseña
 
     public static Connection getConnection() throws Exception {
         return DriverManager.getConnection(URL, USER, PASS);
     }
 
-    /**
-     * Inserta la lectura y devuelve el ID generado para poder hashearlo después.
-     */
     public static int guardarLectura(String sensorId, double temp) {
         String sql = "INSERT INTO lecturas_temperatura (sensor_id, valor_temp) VALUES (?, ?)";
 
@@ -42,9 +39,7 @@ public class DataService {
         return -1;
     }
 
-    /**
-     * Actualiza la fila con el hash del bloque de la Blockchain.
-     */
+
     public static void vincularConBlockchain(int idRegistro, String blockHash) {
         String sql = "UPDATE lecturas_temperatura SET blockchain_hash = ? WHERE id = ?";
 
