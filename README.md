@@ -10,3 +10,6 @@ Además, el proyecto separa claramente las responsabilidades:
 - El servidor gestiona la lógica de control y seguridad.
 - La base de datos (simulada) almacena el historial.
 - La blockchain garantiza que los registros no han sido alterados.
+
+
+<img width="1202" height="743" alt="image" src="https://github.com/user-attachments/assets/5f02b496-44f5-4d69-8f2d-696602c00f48" />
