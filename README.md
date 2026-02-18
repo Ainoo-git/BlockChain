@@ -13,3 +13,5 @@ Además, el proyecto separa claramente las responsabilidades:
 
 
 <img width="1202" height="743" alt="image" src="https://github.com/user-attachments/assets/5f02b496-44f5-4d69-8f2d-696602c00f48" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/92a02854-5629-4ee8-b5db-e5fb95ca89b8" />
