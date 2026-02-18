@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 //Ainoha Yubero Timón
+
 public class Server {
 
     private static final List<Block> blockchain = new ArrayList<>();
@@ -21,8 +22,8 @@ public class Server {
 
     public static void main(String[] args) {
 
-        // Bloque génesis
-        blockchain.add(new Block("Genesis Block", "0"));
+        // Bloque génesis (index 0)
+        blockchain.add(new Block(0, "Genesis Block", "0"));
 
         try (ServerSocket serverSocket = new ServerSocket(6000)) {
             System.out.println("Servidor de Monitoreo listo en puerto 6000...");
@@ -47,7 +48,7 @@ public class Server {
                         break;
                     }
 
-                    // 2. Comprobar temperatura crítica (FAIL-FAST)
+                    // 2. Comprobar temperatura crítica
                     if (temp > TEMP_LIMITE) {
                         System.err.println("CRÍTICO: Temperatura " + temp + "°C excede el límite.");
                         out.println("SISTEMA_APAGADO");
@@ -59,23 +60,31 @@ public class Server {
                     int idGenerado = DataService.guardarLectura(sensorId, temp);
 
                     if (idGenerado != -1) {
+
                         // 4. Crear bloque en la blockchain
-                        String prevHash = blockchain.get(blockchain.size() - 1).hash;
+                        Block ultimoBloque = blockchain.get(blockchain.size() - 1);
+
                         String dataHash = generarDataHash(sensorId, temp, String.valueOf(idGenerado));
 
-                        Block nuevoBloque = new Block(dataHash, prevHash);
+                        Block nuevoBloque = new Block(
+                                blockchain.size(),
+                                dataHash,
+                                ultimoBloque.getHash()
+                        );
+
                         blockchain.add(nuevoBloque);
 
                         // 5. Vincular SQL con Blockchain
-                        DataService.vincularConBlockchain(idGenerado, nuevoBloque.hash);
+                        DataService.vincularConBlockchain(idGenerado, nuevoBloque.getHash());
 
-                        System.out.println("Bloque añadido. Hash: " + nuevoBloque.hash);
+                        System.out.println("Bloque añadido. Hash: " + nuevoBloque.getHash());
                         System.out.println(
                                 "Sincronización completa: SQL (ID " + idGenerado +
-                                        ") <-> Blockchain (Hash " + nuevoBloque.hash.substring(0, 8) + "...)"
+                                        ") <-> Blockchain (Hash " + nuevoBloque.getHash().substring(0, 8) + "...)"
                         );
 
                         out.println("OK");
+
                     } else {
                         out.println("ERROR:No se pudo guardar el registro");
                     }
@@ -86,19 +95,22 @@ public class Server {
         }
     }
 
-    // ================= VALIDACIÓN BLOCKCHAIN =================
+    // VALIDACIÓN BLOCKCHAIN
 
     public static boolean isChainValid() {
         for (int i = 1; i < blockchain.size(); i++) {
+
             Block currentBlock = blockchain.get(i);
             Block previousBlock = blockchain.get(i - 1);
 
-            if (!currentBlock.hash.equals(currentBlock.calculateHash())) {
+            //Verificar el bloque
+            if (!currentBlock.getHash().equals(currentBlock.calculateHash())) {
                 System.err.println("ALERTA: Hash incorrecto en bloque " + i);
                 return false;
             }
 
-            if (!currentBlock.previousHash.equals(previousBlock.hash)) {
+            // Verificar  cadena
+            if (!currentBlock.getPreviousHash().equals(previousBlock.getHash())) {
                 System.err.println("ALERTA: Enlace roto entre bloques " + (i - 1) + " y " + i);
                 return false;
             }
@@ -106,9 +118,10 @@ public class Server {
         return true;
     }
 
-    // ================= HASH DEL REGISTRO SQL =================
+    // HASH DEL REGISTRO SQL
 
     public static String generarDataHash(String sensorId, double temp, String idRegistro) {
+
         String registroCompleto = sensorId + temp + idRegistro;
 
         try {
@@ -122,6 +135,7 @@ public class Server {
                 hexString.append(hex);
             }
             return hexString.toString();
+
         } catch (Exception e) {
             return null;
         }

@@ -8,11 +8,15 @@ import java.sql.Statement;
 //Ainoha Yubero Timón
 public class DataService {
     // Configuración de la base de datos remota
-    private static final String IP = "192.168.20.118";
+    private static final String IP = "localhost";
     private static final String DB = "sistema_monitoreo";
-    private static final String URL = "jdbc:mysql://" + IP + ":3306/" + DB + "?useSSL=false&serverTimezone=UTC";
-    private static final String USER = "Ainoha Yubero Timón";
-    private static final String PASS = "12345"; // Cambia por tu contraseña
+    private static final String URL =
+            "jdbc:mysql://" + IP + ":3306/" + DB +
+                    "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+
+    private static final String USER = "root";
+    private static final String PASS = "root";
+
 
     public static Connection getConnection() throws Exception {
         return DriverManager.getConnection(URL, USER, PASS);
