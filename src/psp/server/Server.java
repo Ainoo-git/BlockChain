@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.sql.ResultSet;   // IMPORTANTE
 import java.util.ArrayList;
 import java.util.List;
 //Ainoha Yubero Timón
@@ -48,7 +49,14 @@ public class Server {
                         break;
                     }
 
-                    // 2. Comprobar temperatura crítica
+                    // 2. Validar integridad de la base de datos
+                    if (!verificarIntegridadBD()) {
+                        System.err.println("ERROR CRÍTICO: Base de datos comprometida");
+                        out.println("ERROR:Base de datos comprometida");
+                        break;
+                    }
+
+                    // 3. Comprobar temperatura crítica
                     if (temp > TEMP_LIMITE) {
                         System.err.println("CRÍTICO: Temperatura " + temp + "°C excede el límite.");
                         out.println("SISTEMA_APAGADO");
@@ -56,12 +64,12 @@ public class Server {
                         break;
                     }
 
-                    // 3. Guardar en base de datos SQL
+                    // 4. Guardar en base de datos SQL
                     int idGenerado = DataService.guardarLectura(sensorId, temp);
 
                     if (idGenerado != -1) {
 
-                        // 4. Crear bloque en la blockchain
+                        // 5. Crear bloque en la blockchain
                         Block ultimoBloque = blockchain.get(blockchain.size() - 1);
 
                         String dataHash = generarDataHash(sensorId, temp, String.valueOf(idGenerado));
@@ -74,7 +82,7 @@ public class Server {
 
                         blockchain.add(nuevoBloque);
 
-                        // 5. Vincular SQL con Blockchain
+                        // 6. Vincular SQL con Blockchain
                         DataService.vincularConBlockchain(idGenerado, nuevoBloque.getHash());
 
                         System.out.println("Bloque añadido. Hash: " + nuevoBloque.getHash());
@@ -96,20 +104,17 @@ public class Server {
     }
 
     // VALIDACIÓN BLOCKCHAIN
-
     public static boolean isChainValid() {
         for (int i = 1; i < blockchain.size(); i++) {
 
             Block currentBlock = blockchain.get(i);
             Block previousBlock = blockchain.get(i - 1);
 
-            //Verificar el bloque
             if (!currentBlock.getHash().equals(currentBlock.calculateHash())) {
                 System.err.println("ALERTA: Hash incorrecto en bloque " + i);
                 return false;
             }
 
-            // Verificar  cadena
             if (!currentBlock.getPreviousHash().equals(previousBlock.getHash())) {
                 System.err.println("ALERTA: Enlace roto entre bloques " + (i - 1) + " y " + i);
                 return false;
@@ -118,8 +123,45 @@ public class Server {
         return true;
     }
 
-    // HASH DEL REGISTRO SQL
+    // VALIDACIÓN BASE DE DATOS
+    public static boolean verificarIntegridadBD() {
 
+        try {
+            ResultSet rs = DataService.obtenerRegistros();
+            int index = 1; // empezamos en 1 porque 0 es bloque génesis
+
+            while (rs != null && rs.next()) {
+
+                int id = rs.getInt("id");
+                String sensorId = rs.getString("sensor_id");
+                double temp = rs.getDouble("valor_temp");
+
+                if (index >= blockchain.size()) {
+                    break;
+                }
+
+                Block bloque = blockchain.get(index);
+
+                String hashRecalculado =
+                        generarDataHash(sensorId, temp, String.valueOf(id));
+
+                if (!hashRecalculado.equals(bloque.getDataHash())) {
+                    System.err.println("ALERTA: Base de datos alterada en ID " + id);
+                    return false;
+                }
+
+                index++;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    // HASH DEL REGISTRO SQL
     public static String generarDataHash(String sensorId, double temp, String idRegistro) {
 
         String registroCompleto = sensorId + temp + idRegistro;

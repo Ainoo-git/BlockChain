@@ -59,6 +59,7 @@ public class DataService {
         }
     }
     // Obtener todos los registros para verificación de integridad
+
     public static ResultSet obtenerRegistros() {
         String sql = "SELECT id, sensor_id, valor_temp FROM lecturas_temperatura ORDER BY id ASC";
 
