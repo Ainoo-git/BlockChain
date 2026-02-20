@@ -58,4 +58,17 @@ public class DataService {
             System.err.println("Error al vincular con Blockchain: " + e.getMessage());
         }
     }
+    // Obtener todos los registros para verificación de integridad
+    public static ResultSet obtenerRegistros() {
+        String sql = "SELECT id, sensor_id, valor_temp FROM lecturas_temperatura ORDER BY id ASC";
+
+        try {
+            Connection conn = getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            return pstmt.executeQuery();
+        } catch (Exception e) {
+            System.err.println("Error al obtener registros: " + e.getMessage());
+            return null;
+        }
+    }
 }
