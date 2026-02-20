@@ -1,12 +1,45 @@
-Este proyecto simula un sistema de control de temperatura basado en una arquitectura cliente-servidor, cuyo objetivo es garantizar que los datos no puedan ser modificados sin ser detectados.
+# Sistema de Monitorización de Temperatura con Blockchain
 
-Un cliente actúa como sensor, enviando lecturas de temperatura a un servidor central. El servidor valida los datos recibidos, comprueba si la temperatura supera un umbral de seguridad y, en caso contrario, registra la información.
+### Descripción
 
-Para asegurar la integridad de los datos, el sistema utiliza una blockchain sencilla, donde cada registro se almacena en un bloque enlazado criptográficamente con el anterior mediante hashes SHA-256. De esta forma, cualquier intento de modificar un dato previamente almacenado rompe la cadena y es detectado automáticamente.
+Este proyecto simula un sistema de control de temperatura basado en una arquitectura cliente-servidor. El objetivo es garantizar que los datos registrados no puedan modificarse sin ser detectados.
 
-Además, el proyecto separa claramente las responsabilidades:
+Un cliente actúa como sensor y envía lecturas de temperatura a un servidor. El servidor valida los datos, comprueba si superan un límite de seguridad y, si son correctos, los guarda en una base de datos.
 
-- El sensor únicamente envía datos.
-- El servidor gestiona la lógica de control y seguridad.
-- La base de datos (simulada) almacena el historial.
-- La blockchain garantiza que los registros no han sido alterados.
+Para asegurar la integridad, cada registro se certifica mediante una blockchain sencilla. Cada bloque almacena el hash del registro y el hash del bloque anterior, utilizando SHA-256. Si un dato es modificado, la cadena se rompe y la manipulación se detecta automáticamente.
+
+---
+
+### Componentes del sistema
+
+- **Cliente**: Envía la temperatura al servidor.  
+- **Servidor**: Valida la cadena, controla el límite de seguridad y gestiona el almacenamiento.  
+- **Base de datos (MySQL)**: Guarda el histórico de temperaturas.  
+- **Blockchain**: Garantiza que los registros no han sido alterados.  
+
+---
+
+### Funcionamiento básico
+
+1. El cliente envía una temperatura.  
+2. El servidor valida la blockchain.  
+3. Si la temperatura es menor de 50°C, se guarda en la base de datos.  
+4. Se genera un hash del registro.  
+5. Se crea un nuevo bloque enlazado al anterior.  
+6. El hash del bloque se guarda en la base de datos.  
+
+---
+
+### Seguridad
+
+Si la temperatura supera los **50°C**, el servidor envía el mensaje:
+
+SISTEMA_APAGADO
+
+y detiene el proceso.
+
+La integridad se garantiza mediante la fórmula:
+
+SHA256(index + timestamp + dataHash + previousHash)
+
+Cualquier modificación en la base de datos rompe la cadena y es detectada automáticamente.
